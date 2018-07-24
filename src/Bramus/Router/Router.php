@@ -17,6 +17,7 @@ class Router
      * @var array The route patterns and their handling functions
      */
     public $afterRoutes = array();
+    public $fn = "";
 
     /**
      * @var array The before middleware route patterns and their handling functions
@@ -80,10 +81,19 @@ class Router
         $pattern = $this->baseRoute.'/'.trim($pattern, '/');
         $pattern = $this->baseRoute ? rtrim($pattern, '/') : $pattern;
 
+        $uri = $this->getCurrentUri();
+
+
         foreach (explode('|', $methods) as $method) {
+            $active = false;
+            if($pattern == $uri ){
+                $this->fn = $fn;
+                $active = true;
+            }
             $this->afterRoutes[$method][] = array(
                 'pattern' => $pattern,
                 'fn' => $fn,
+                'active' => $active,
             );
         }
     }

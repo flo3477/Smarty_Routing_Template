@@ -15,10 +15,28 @@ $router = new \Bramus\Router\Router();
 
 $router->all('/', 'Main@index');
 
-$template = explode("@",$router->afterRoutes["GET"][0]["fn"]);
+
+$template = explode("@",$router->fn);
 $router->run(function() use ($tpl) {
+    $showInNav = array(
+        "/" => "HOME",
+    );
+
     $tpl->setTemplateDir(__DIR__."/templates/v1/");
-    $tpl->display($GLOBALS["template"][1].".tpl");
+    $templateDir = $GLOBALS["template"][0]."/".$GLOBALS["template"][1].".tpl";
+    $routerUrls = $GLOBALS["router"]->afterRoutes["GET"];
+    $routerUrlsShow = array();
+    foreach ( $routerUrls  as $urls){
+        foreach ($showInNav as $key => $value){
+            if($key == $urls["pattern"]){
+                $urls["label"] = $value;
+                $routerUrlsShow[] = $urls;
+            }
+        }
+    }
+    $GLOBALS["tpl"]->assign("routerUrls", $routerUrlsShow);
+    $GLOBALS["tpl"]->assign("includeDir", "/templates/v1/".$GLOBALS["template"][0]."/");
+    $tpl->display($templateDir);
 });
 
 
